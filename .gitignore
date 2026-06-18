@@ -1,0 +1,18 @@
+# Python
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+*.py[cod]
+
+# Local app/runtime data
+**/.playwright-cli/
+**/.streamlit/secrets.toml
+*.log
+.env
+
+# Project-generated vector data
+04_Data/chroma/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

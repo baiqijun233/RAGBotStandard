@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project001 RAG Bot Standard 项目解析</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f7f4;
+      --text: #202124;
+      --muted: #60646c;
+      --line: #d9d9d2;
+      --panel: #ffffff;
+      --accent: #1b6f5f;
+      --accent-soft: #e4f2ee;
+      --warn: #8a5a00;
+      --warn-soft: #fff3d8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    header {
+      padding: 44px 24px 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+    main {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 28px 24px 56px;
+    }
+    h1, h2, h3 { line-height: 1.25; margin: 0 0 14px; }
+    h1 { font-size: 34px; }
+    h2 { font-size: 24px; padding-top: 22px; border-top: 1px solid var(--line); }
+    h3 { font-size: 18px; margin-top: 22px; }
+    p { margin: 8px 0 14px; }
+    code, pre {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 14px;
+    }
+    pre {
+      background: #222;
+      color: #f6f6f6;
+      padding: 14px;
+      overflow-x: auto;
+      border-radius: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      margin: 14px 0 24px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      padding: 10px 12px;
+    }
+    th { background: #ecece6; }
+    .lede {
+      max-width: 900px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+      margin: 18px 0 26px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 14px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 13px;
+      margin-right: 6px;
+    }
+    .notice {
+      background: var(--warn-soft);
+      border: 1px solid #edd08f;
+      color: var(--warn);
+      padding: 12px 14px;
+      border-radius: 6px;
+      margin: 14px 0 22px;
+    }
+    .flow {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 14px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Project001 RAG Bot Standard 项目解析</h1>
+    <p class="lede">这份网页文档说明 Project001 的核心入口、模块分工、运行流程、本轮改造重点、当前边界和后续方向。它对应的主项目目录是 <code>E:\Agent\AIProjects\Project001_RAGBotStandard</code>。</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>一、项目定位</h2>
+      <p>这个项目是一个本地 Streamlit PDF RAG 应用。用户上传 PDF 后，系统会读取文本、切分片段、写入 Chroma 向量库，再根据问题检索相关片段，并调用大模型生成中文回答。</p>
+      <div class="grid">
+        <div class="card"><span class="tag">入口</span><p><code>02_Source/rag-bot-standard/app.py</code></p></div>
+        <div class="card"><span class="tag">数据</span><p><code>04_Data/chroma</code></p></div>
+        <div class="card"><span class="tag">文档</span><p><code>05_Docs</code></p></div>
+        <div class="card"><span class="tag">验证</span><p><code>07_Logs/Verification_Log.md</code></p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>二、核心入口是什么</h2>
+      <p>核心入口是 <code>app.py</code>。它负责 Streamlit 页面、登录、上传 PDF、侧边栏配置、历史记录展示、调用向量检索、调用大模型、展示答案和来源。</p>
+      <pre>cd E:\Agent\AIProjects\Project001_RAGBotStandard\02_Source\rag-bot-standard
+.\.venv\Scripts\Activate.ps1
+python -m streamlit run app.py</pre>
+      <p>浏览器打开 <code>http://localhost:8501</code> 后，先进入登录页，再进入 RAG 问答页面。</p>
+    </section>
+
+    <section>
+      <h2>三、运行流程</h2>
+      <div class="flow">
+        登录 -> 上传 PDF -> 提取文本 -> 切分 chunk -> 写入 Chroma -> 用户提问 -> similarity_search -> 组装 Prompt -> LLM 普通或 SSE 流式回答 -> 保存历史 -> 展示来源
+      </div>
+    </section>
+
+    <section>
+      <h2>四、模块作用</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>文件</th>
+            <th>作用</th>
+            <th>本轮改造点</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>app.py</code></td>
+            <td>Streamlit 页面入口，负责把所有模块串起来。</td>
+            <td>新增登录页、聊天历史、SSE 开关、Chroma 目录展示、来源展示。</td>
+          </tr>
+          <tr>
+            <td><code>rag_bot/auth.py</code></td>
+            <td>读取登录配置并校验用户名密码。</td>
+            <td>新增本地轻量登录，支持环境变量覆盖默认账号。</td>
+          </tr>
+          <tr>
+            <td><code>rag_bot/chat_history.py</code></td>
+            <td>管理 Streamlit 会话中的消息列表。</td>
+            <td>新增历史记录、清空历史、退出登录清理。</td>
+          </tr>
+          <tr>
+            <td><code>rag_bot/pdf_loader.py</code></td>
+            <td>读取 PDF 文本并切分成适合检索的片段。</td>
+            <td>保留原有职责，继续作为 RAG 数据入口。</td>
+          </tr>
+          <tr>
+            <td><code>rag_bot/vectorstore.py</code></td>
+            <td>创建 Chroma 向量库并执行后续检索。</td>
+            <td>新增项目内持久化目录、稳定集合名、稳定片段 ID。</td>
+          </tr>
+          <tr>
+            <td><code>rag_bot/rag_answering.py</code></td>
+            <td>把检索片段整理成中文 RAG Prompt，并处理无 Key 降级回答。</td>
+            <td>修复中文提示词乱码，保留非流式回答流程。</td>
+          </tr>
+          <tr>
+            <td><code>rag_bot/llm_client.py</code></td>
+            <td>调用 OpenAI 兼容 Chat Completions 接口。</td>
+            <td>新增 DeepSeek 默认配置、SSE 流式请求、流式内容解析。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>五、改造重点</h2>
+      <h3>1. 从检索器升级为问答机器人</h3>
+      <p>早期代码只把检索片段展示出来。现在会把多个片段组织成 Prompt，并交给大模型生成中文答案。</p>
+
+      <h3>2. 从临时 Chroma 改为项目内持久化</h3>
+      <p>Chroma 数据固定写入 <code>04_Data/chroma</code>，符合“所有项目相关内容都必须放在项目文件夹内”的规则。</p>
+
+      <h3>3. 增加可测试的登录和历史记录</h3>
+      <p>登录和历史记录没有直接写死在页面逻辑里，而是拆成小模块，方便测试和以后替换。</p>
+
+      <h3>4. 增加 SSE 流式输出</h3>
+      <p>LLM 客户端可以解析 OpenAI 兼容的 <code>data: {...}</code> 流式响应。页面提供开关，服务商不稳定时可以切回普通回答。</p>
+
+      <h3>5. 修复乱码并补文档</h3>
+      <p>本轮把 README、工作台、迁移说明、困难总结、网页解析文档重新整理为正常中文，并记录了本次遇到的问题。</p>
+    </section>
+
+    <section>
+      <h2>六、配置说明</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>用途</th>
+            <th>环境变量</th>
+            <th>说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>登录用户名</td><td><code>RAG_BOT_USERNAME</code></td><td>不设置时默认 admin。</td></tr>
+          <tr><td>登录密码</td><td><code>RAG_BOT_PASSWORD</code></td><td>不设置时默认 ragbot。</td></tr>
+          <tr><td>DeepSeek Key</td><td><code>DEEPSEEK_API_KEY</code></td><td>默认模型为 deepseek-v4-pro。</td></tr>
+          <tr><td>Groq Key</td><td><code>GROQ_API_KEY</code></td><td>默认模型为 llama-3.1-8b-instant。</td></tr>
+          <tr><td>OpenAI Key</td><td><code>OPENAI_API_KEY</code></td><td>默认模型为 gpt-4o-mini。</td></tr>
+          <tr><td>自定义接口</td><td><code>OPENAI_COMPATIBLE_API_KEY</code></td><td>配合 Base URL 和模型名使用。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>七、测试覆盖</h2>
+      <p>当前测试覆盖了这些关键点：</p>
+      <ul>
+        <li>PDF 空文本和长文本切分。</li>
+        <li>RAG Prompt 是否包含问题和上下文。</li>
+        <li>无 LLM 时是否降级展示检索依据。</li>
+        <li>DeepSeek、Groq、OpenAI 默认模型和接口。</li>
+        <li>SSE 流式内容解析和异常处理。</li>
+        <li>登录默认配置、环境变量配置、密码校验。</li>
+        <li>历史记录追加、清空、空内容拦截。</li>
+        <li>Chroma 目录、集合名、片段 ID 稳定性。</li>
+      </ul>
+      <pre>.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m compileall app.py rag_bot tests</pre>
+    </section>
+
+    <section>
+      <h2>八、当前边界</h2>
+      <div class="notice">
+        这个项目已经具备本地测试所需的核心能力，但登录仍是轻量门禁，历史记录仍是会话级保存，真实大模型回答还需要配置有效 API Key 后继续联调。
+      </div>
+      <ul>
+        <li>历史记录不会跨服务重启长期保存。</li>
+        <li>登录没有数据库账号系统，适合本地和轻量演示。</li>
+        <li>SSE 依赖服务商是否完整支持 OpenAI 兼容流式格式。</li>
+        <li>没有 API Key 时不会产生真正的 AI 总结，只会显示检索依据。</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
