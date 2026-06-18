@@ -2,7 +2,7 @@
 
 An interview-ready local AI project built with Streamlit, LangChain, and Chroma. It supports PDF upload, vector retrieval, RAG question answering, DeepSeek and OpenAI-compatible model integration, SSE streaming output, login, and chat history.
 
-一个面向面试展示的本地 AI 项目：基于 Streamlit、LangChain 和 Chroma，实现 PDF 上传、向量检索、RAG 问答、DeepSeek/OpenAI 兼容模型接入、SSE 流式输出、登录和历史记录。
+一个本地运行的 PDF RAG 项目，基于 Streamlit、LangChain 和 Chroma，实现 PDF 上传、向量检索、RAG 问答、DeepSeek/OpenAI 兼容模型接入、SSE 流式输出、登录和历史记录。
 
 ## 项目亮点
 
@@ -13,15 +13,17 @@ An interview-ready local AI project built with Streamlit, LangChain, and Chroma.
 - 支持本地登录和会话级历史记录
 - 包含单元测试、验证日志、迁移说明和架构解析文档
 
-## 适合面试讲什么
+## 项目价值
 
-这个项目不只是一个“跑通教程”的 Demo，而是一个做过整理和升级的 RAG 项目，适合展示这些能力：
+这个项目围绕本地知识问答场景进行了完整实现和工程化整理，适合作为 RAG 项目的展示样例。它覆盖了文档处理、向量检索、大模型接入、流式输出、登录控制、历史记录和项目结构标准化等关键环节。
 
-- 如何把 PDF 文档转成可检索的知识库
-- RAG 检索链路是怎么工作的
-- 如何把大模型接入到本地网页应用
-- 如何处理登录、历史记录、流式输出和持久化这些工程问题
-- 如何把一个零散项目迁移成可维护的标准项目结构
+它重点体现这些能力：
+
+- 将 PDF 文档转换为可检索的本地知识库
+- 构建从检索到生成的 RAG 问答链路
+- 将大模型能力接入到本地网页应用
+- 处理登录、历史记录、流式输出和持久化等工程问题
+- 将零散原型整理为可维护的标准项目结构
 
 ## 技术栈
 
@@ -67,7 +69,7 @@ Project001_RAGBotStandard/
 02_Source/rag-bot-standard/app.py
 ```
 
-## 快速启动
+## 运行方式
 
 ```powershell
 cd E:\Agent\AIProjects\Project001_RAGBotStandard\02_Source\rag-bot-standard
@@ -75,7 +77,7 @@ cd E:\Agent\AIProjects\Project001_RAGBotStandard\02_Source\rag-bot-standard
 python -m streamlit run app.py
 ```
 
-浏览器打开：
+访问地址：
 
 ```text
 http://localhost:8501
@@ -110,4 +112,4 @@ $env:RAG_BOT_PASSWORD="your_password"
 - 历史记录目前只保存在当前会话内，不是长期数据库存储
 - 登录是本地轻量门禁，不是完整用户系统
 - 真实大模型端到端演示仍需要配置可用的 API Key
-- 当前更适合本地演示、学习和面试展示，不是直接上线的生产版本
+- 当前更适合本地演示、学习和项目展示，不是直接上线的生产版本
