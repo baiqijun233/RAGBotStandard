@@ -1,5 +1,7 @@
 # RAGBotStandard
 
+An interview-ready local AI project built with Streamlit, LangChain, and Chroma. It supports PDF upload, vector retrieval, RAG question answering, DeepSeek and OpenAI-compatible model integration, SSE streaming output, login, and chat history.
+
 一个面向面试展示的本地 AI 项目：基于 Streamlit、LangChain 和 Chroma，实现 PDF 上传、向量检索、RAG 问答、DeepSeek/OpenAI 兼容模型接入、SSE 流式输出、登录和历史记录。
 
 ## 项目亮点
